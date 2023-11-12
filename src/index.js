@@ -1,4 +1,5 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 import {
   getFirestore,
   collection,
@@ -13,20 +14,24 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyBEKKXD0Tv-W4G77w2h4w6SJI1o1Ky3h4Y",
   authDomain: "data-storytelling-itd112.firebaseapp.com",
   projectId: "data-storytelling-itd112",
   storageBucket: "data-storytelling-itd112.appspot.com",
   messagingSenderId: "331740563793",
-  appId: "1:331740563793:web:bbd84d1eff8bcc2417eb70"
+  appId: "1:331740563793:web:bbd84d1eff8bcc2417eb70",
+  measurementId: "G-64FKBPKFZW"
 };
 
-// Initialize firebase app
-const firebaseApp = initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 // Initialize Firestore
-const db = getFirestore(firebaseApp);
+const db = getFirestore(app);
 
 // Collection reference
 const colRef = collection(db, 'dengue');

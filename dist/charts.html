@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE-edge">
+  <meta name="viewport" content="width=device-width, intial-scale=1.0">
+  <title> Visualizations - noiSENSOR </title>
+  <link rel="icon" href="images/logo.png" type="image/x-icon">
+    <!-- Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- ====== ionicons ======= -->
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <!-- Data From Firebase to DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+
+  <!----Style Sheet---->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+  <!-- ================ Data Visualizations ================= -->
+
+  <div class="details">
+    <div class="recentOrders">
+        <div class="cardHeader">
+          <h2 style="color: hsl(34, 100%, 51%);">Data Visualization</h2>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="chartsBx">
+          <div class="chart">
+            <h2>Pie Chart</h2>
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chartsBx">
+          <div class="chart">
+              <h2>Line Chart</h2>
+              <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chartsBx">
+          <div class="chart">
+            <h2>Bubble Chart</h2>
+              <canvas id="bubbleChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chartsBx">
+          <div class="chart">
+            <h2>Doughnut Chart</h2>
+              <canvas id="donutChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chartsBx">
+          <div class="chart">
+            <h2>Radar Chart</h2>
+              <canvas id="radarChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chartsBx">
+          <div class="chart">
+            <h2>Area Chart</h2>
+              <canvas id="areaChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chartsBx">
+          <div class="chart">
+            <h2>Bar Chart</h2>
+              <canvas id="barChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chartsBx">
+          <div class="chart">
+              <h2>Spectral Plot Chart</h2>
+              <canvas id="spectralChart"></canvas>
+            </div>
+        </div>
+
+        </div>
+    </div>
+  </div>
+</div>
+
+  <!-- ======= Scripts ====== -->
+  <script src="assets/js/main.js"></script>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<!-- firebase js -->
+<script type="module">
+
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js';
+  import { getAnalytics } from 'https://www.gstatic.com/firebasejs/9.10.0/firebase-analytics.js';
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    GoogleAuthProvider,
+    signInWithRedirect,
+    getRedirectResult,
+    signInWithPopup,
+    onAuthStateChanged
+  }
+    from 'https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js';
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    connectFirestoreEmulator,
+    query,
+    getDocs,
+    getDoc,
+    updateDoc,
+    setDoc,
+    doc,
+    onSnapshot,
+    deleteDoc,
+    orderBy
+  } from 'https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js';
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBEKKXD0Tv-W4G77w2h4w6SJI1o1Ky3h4Y",
+  authDomain: "data-storytelling-itd112.firebaseapp.com",
+  projectId: "data-storytelling-itd112",
+  storageBucket: "data-storytelling-itd112.appspot.com",
+  messagingSenderId: "331740563793",
+  appId: "1:331740563793:web:bbd84d1eff8bcc2417eb70",
+  measurementId: "G-64FKBPKFZW"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+//Firestore
+const db = getFirestore();
+
+//Charts
+firebase.initializeApp(firebaseConfig);
+const db2 = firebase.firestore();
+
+// Pie chart
+const ctxPie = document.getElementById('pieChart').getContext('2d');
+let chartPie;
+
+db2.collection('dengue')
+  .onSnapshot((querySnapshot) => {
+    const regionData = {};
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const region = data['region'];
+      const cases = data['cases'];
+
+      if (!regionData[region]) {
+        regionData[region] = 0;
+      }
+
+      regionData[region] += cases;
+    });
+
+    const labels = Object.keys(regionData);
+    const data = Object.values(regionData);
+
+    const pieData = {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 206, 86, 0.7)',
+          'rgba(75, 192, 192, 0.7)',
+          'rgba(153, 102, 255, 0.7)',
+          'rgba(255, 159, 64, 0.7)',
+        ],
+      }],
+    };
+
+    if (chartPie) {
+      chartPie.destroy();
+    }
+
+    chartPie = new Chart(ctxPie, {
+      type: 'pie',
+      data: pieData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        // ... Other options ...
+      }
+    });
+  }, (error) => {
+    console.error("Error retrieving data from Firestore: ", error);
+  });
+</script>
+</body>
+</html>
