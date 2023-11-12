@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Read CSV/Exceel</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+   <!-- Include Bootstrap CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+   <!-- Include DataTables CSS -->
+   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+
+  <!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <script>
+    // Function to include external HTML files
+    function includeHTML(file, elementId) {
+      fetch(file)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById(elementId).innerHTML = html;
+        })
+        .catch(error => console.error('Error fetching HTML:', error));
+    }
+
+    // Include header.html
+    includeHTML('header.html', 'header');
+
+    // Include navigation.html
+    includeHTML('sidebar.html', 'sidebar');
+  </script>
+</head>
+
+<body>
+
+    <div id="header"></div>
+    <div id="sidebar"></div>
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Read CSV/Exceel</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+          <li class="breadcrumb-item active">File Extraction</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+    
+    <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Upload CSV/Exceel File</h5>
+
+    <div class="container">
+        <!-- New file input field for uploading CSV/Excel file -->
+        <div class="mb-3">
+            <input type="file" class="form-control" id="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required>
+        </div>
+        <div class="mb-3">
+            <button type="button" class="btn btn-success" id="readCsvBtn">Read CSV</button>
+            <button type="button" class="btn btn-primary" id="storeToDatabaseBtn">Store to Database</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+        
+    <div class="container">
+        <div id="dashboard">
+            <table class="table" id="readTable">
+                <thead>
+                    <tr>
+                        <!-- Fields will be dynamically inserted here -->
+                    </tr>
+                </thead>
+                <tbody id="readTableBody">
+                    <!-- Display Data Here -->
+                </tbody>
+            </table>
+        </div>
+    </div><br>
+
+    <h5 class="card-title">Data Visualization</h5>
+     <!-- Dropdowns for field selection -->
+        <div class="container">
+            <div class="mb-3">
+                <label for="xAxisField" class="form-label">Select X-Axis Field:</label>
+                <select class="form-select" id="xAxisField"></select>
+            </div>
+        
+            <div class="mb-3">
+                <label for="yAxisField" class="form-label">Select Y-Axis Field:</label>
+                <select class="form-select" id="yAxisField"></select>
+            </div>
+
+            <div class="mb-3">
+                <label for="chartType" class="form-label">Select Chart Type:</label>
+                <select class="form-select" id="chartType">
+                    <option value="bar">Bar Chart</option>
+                    <option value="line">Line Chart</option>
+                    <option value="pie">Pie Chart</option>
+                    <option value="doughnut">Doughnut Chart</option>
+                    <option value="scatter">Scatter Plot</option>
+                    <option value="area">Area Chart</option>
+                    <!-- Add more chart types as needed -->
+                </select>
+            </div>
+        
+            <!-- Add a canvas to display the chart -->
+            <div class="mb-3">
+                <canvas id="chartCanvas" width="800" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+ 
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include DataTables JS -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <!-- Include papaparse library for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+ 
+    <script src="bundle.js"></script>
+
+    <script>
+        // Global variable to store CSV data
+        let csvData = [];
+
+        // Function to generate a random color
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+      
+        // Function to update the chart with selected fields
+        function updateChart(data, chartType, xField, yField) {
+          const chartCanvas = document.getElementById('chartCanvas');
+          const ctx = chartCanvas.getContext('2d');
+      
+          if (window.myChart) {
+            window.myChart.destroy();
+          }
+      
+          // Prepare chart data using selected fields
+        const labels = data.map(row => row[xField]);
+        let datasets = [];
+
+        if (chartType === 'bar' || chartType === 'line') {
+            // For bar and line charts, use one color per dataset
+            datasets = [{
+                label: yField,
+                data: data.map(row => row[yField]),
+                backgroundColor: getRandomColor(),
+                borderColor: getRandomColor(),
+                borderWidth: 1
+            }];
+        } else if (chartType === 'pie' || chartType === 'doughnut') {
+            // For pie and doughnut charts, use a different color for each data point
+            const backgroundColors = data.map(() => getRandomColor());
+            datasets = [{
+                label: yField,
+                data: data.map(row => row[yField]),
+                backgroundColor: backgroundColors
+            }];
+        }
+      
+          // Chart configuration
+          const options = {
+            responsive: true,
+            maintainAspectRatio: false
+          };
+      
+          // Create and render the chart
+          window.myChart = new Chart(ctx, {
+            type: chartType,
+            data: {
+              labels: labels,
+              datasets: datasets
+            },
+            options: options
+          });
+        }
+      
+        // Function to populate field selection dropdowns
+        function populateFieldSelection(data) {
+          const fields = Object.keys(data[0]);
+          const xAxisFieldSelect = document.getElementById('xAxisField');
+          const yAxisFieldSelect = document.getElementById('yAxisField');
+      
+          xAxisFieldSelect.innerHTML = '';
+          yAxisFieldSelect.innerHTML = '';
+      
+          fields.forEach(field => {
+            xAxisFieldSelect.innerHTML += `<option value="${field}">${field}</option>`;
+            yAxisFieldSelect.innerHTML += `<option value="${field}">${field}</option>`;
+          });
+        }
+      
+        // Function to update the table display
+        function updateTable(data) {
+          const readTable = $('#readTable');
+          const readTableBody = $('#readTableBody');
+      
+          readTable.find('thead tr').html('');
+          readTableBody.html('');
+      
+          if (data.length > 0) {
+            const fields = Object.keys(data[0]);
+      
+            fields.forEach(field => {
+              const sanitizedField = field.replace(/\s+/g, '_');
+              readTable.find('thead tr').append(`<th>${sanitizedField}</th>`);
+            });
+      
+            data.forEach(dataRow => {
+              const row = $('<tr>');
+      
+              fields.forEach(field => {
+                row.append(`<td>${dataRow[field]}</td>`);
+              });
+      
+              readTableBody.append(row);
+            });
+      
+            // Initialize DataTable with scrollX option
+            readTable.DataTable({
+                scrollX: true,
+            });
+          } else {
+            alert('The dataset is empty.');
+          }
+        }
+      
+        // Read CSV button functionality
+        document.getElementById('readCsvBtn').addEventListener('click', function () {
+          const fileInput = document.getElementById('file');
+          const file = fileInput.files[0];
+      
+          if (file) {
+            showLoadingSpinner();
+            Papa.parse(file, {
+              header: true,
+              dynamicTyping: true,
+              complete: function (results) {
+                csvData = results.data;
+                populateFieldSelection(csvData); // Populate field selection dropdowns
+                updateTable(csvData);
+                hideLoadingSpinner();
+              },
+            });
+          } else {
+            alert('Please select a file to read CSV/Excel.');
+          }
+        });
+      
+        // Chart type and field change event listeners
+        document.getElementById('chartType').addEventListener('change', updateChartBasedOnSelection);
+        document.getElementById('xAxisField').addEventListener('change', updateChartBasedOnSelection);
+        document.getElementById('yAxisField').addEventListener('change', updateChartBasedOnSelection);
+      
+        function updateChartBasedOnSelection() {
+          const selectedChartType = document.getElementById('chartType').value;
+          const selectedXField = document.getElementById('xAxisField').value;
+          const selectedYField = document.getElementById('yAxisField').value;
+          updateChart(csvData, selectedChartType, selectedXField, selectedYField);
+        }
+      
+        // Function to show the loading spinner
+        function showLoadingSpinner() {
+          $('#loadingSpinner').show();
+        }
+      
+        // Function to hide the loading spinner
+        function hideLoadingSpinner() {
+          $('#loadingSpinner').hide();
+        }
+      </script>
+      
+ </body>
+ </html>

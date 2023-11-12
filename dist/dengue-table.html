@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Tables / Data</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+   <!-- Include DataTables CSS with additional styling -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.css">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <script>
+    // Function to include external HTML files
+    function includeHTML(file, elementId) {
+      fetch(file)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById(elementId).innerHTML = html;
+        })
+        .catch(error => console.error('Error fetching HTML:', error));
+    }
+
+    // Include header.html
+    includeHTML('header.html', 'header');
+
+    // Include navigation.html
+    includeHTML('sidebar.html', 'sidebar');
+  </script>
+
+</head>
+
+<body>
+
+    <div id="header"></div>
+    <div id="sidebar"></div>
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Data Tables</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
+          <li class="breadcrumb-item">Tables</li>
+          <li class="breadcrumb-item active">Data</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+                <!-- Redirect to add_form.html when the button is clicked -->
+                <button type="button" class="btn btn-primary" onclick="redirectToAddForm()">Add a New Case</button>
+        </div>
+        
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Dengue Cases</h5>
+
+                <!-- Table with stripped rows -->
+                <div id="dashboard">
+                  <table class="table" id="dashboardTable">
+                    <thead>
+                      <tr>
+                        <th>Location</th>
+                        <th>Number of Cases</th>
+                        <th>Number of Deaths</th>
+                        <th>Date</th>
+                        <th>Region</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashboardTableBody">
+                      <!-- Display Data Here -->
+                    </tbody>
+                  </table>
+                  <!-- End Table with stripped rows -->
+                </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal for Edit Case -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editModalLabel">Edit Case</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Your form fields for editing here -->
+              <form id="editCaseForm">
+                <input type="hidden" id="editId">
+                <div class="mb-3">
+                  <label for="editLoc" class="form-label">Location</label>
+                  <input type="text" class="form-control" id="editLoc" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editCases" class="form-label">Number of Cases</label>
+                  <input type="number" class="form-control" id="editCases" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editDeaths" class="form-label">Number of Deaths</label>
+                  <input type="number" class="form-control" id="editDeaths" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editReportedAt" class="form-label">Date</label>
+                  <input type="date" class="form-control" id="editReportedAt" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editRegion" class="form-label">Region</label>
+                  <input type="text" class="form-control" id="editRegion" required>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="saveEdit()">Update</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+  </main><!-- End #main -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Include jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Include DataTables JS -->
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.js"></script>
+  <!-- Include papaparse library for CSV parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/chart.js/chart.umd.js"></script>
+  <script src="assets/vendor/echarts/echarts.min.js"></script>
+  <script src="assets/vendor/quill/quill.min.js"></script>
+  <script src="assets/vendor/tinymce/tinymce.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <script src="bundle.js"></script>
+
+</body>
+</html>
+
+ <!-- JavaScript function to redirect to add_form.html -->
+ <script>
+    function redirectToAddForm() {
+      window.location.href = 'add_form.html';
+    }
+  </script>
+
+  <script>
+    // Function to update the dashboard display
+    function updateDashboard(data) {
+        const dashboardTableBody = document.getElementById('dashboardTableBody');
+        dashboardTableBody.innerHTML = ''; // Clear previous content
+
+        data.forEach((caseData) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${caseData.loc}</td>
+            <td>${caseData.cases}</td>
+            <td>${caseData.deaths}</td>
+            <td>${caseData.reportedAt}</td>
+            <td>${caseData.region}</td>
+            <td>
+            <button type="button" class="btn btn-warning" onclick="openEditModal('${caseData.id}', '${caseData.loc}', ${caseData.cases}, ${caseData.deaths}, '${caseData.reportedAt}', '${caseData.region}')">Edit</button>
+            <button type="button" class="btn btn-danger" onclick="deleteCase('${caseData.id}')">Delete</button>
+            </td>
+        `;
+        dashboardTableBody.appendChild(row);
+        });
+
+        // Initialize DataTable after updating the content
+        $('#dashboardTable').DataTable();
+    }
+
+    // Function to open the Edit modal and pre-fill data
+    function openEditModal(id, loc, cases, deaths, reportedAt, region) {
+      // Set the values of the input fields in the modal
+      document.getElementById('editId').value = id;
+      document.getElementById('editLoc').value = loc;
+      document.getElementById('editCases').value = cases;
+      document.getElementById('editDeaths').value = deaths;
+      document.getElementById('editReportedAt').value = reportedAt;
+      document.getElementById('editRegion').value = region;
+  
+      // Show the Edit modal
+      const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+      editModal.show();
+    }
+
+    async function saveEdit() {
+      const editId = document.getElementById('editId').value;
+      const editLoc = document.getElementById('editLoc').value;
+      const editCases = parseInt(document.getElementById('editCases').value);
+      const editDeaths = parseInt(document.getElementById('editDeaths').value);
+      const editReportedAt = document.getElementById('editReportedAt').value;
+      const editRegion = document.getElementById('editRegion').value;
+  
+      try {
+        // Update the document in Firestore
+        await updateDoc(doc(colRef, editId), {
+          loc: editLoc,
+          cases: editCases,
+          deaths: editDeaths,
+          reportedAt: editReportedAt,
+          region: editRegion,
+        });
+  
+        // Close the modal
+        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+        editModal.hide();
+      } catch (error) {
+        console.error('Error updating document: ', error);
+      }
+    }
+  
+    // Add a listener for the form submission
+    const editCaseForm = document.getElementById('editCaseForm');
+    editCaseForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      saveEdit();
+    });
+  </script>
+
+  <script>
+    // Read CSV button functionality
+    document.getElementById('readCsvBtn').addEventListener('click', function () {
+      const fileInput = document.getElementById('file');
+      const file = fileInput.files[0];
+
+      if (file) {
+        Papa.parse(file, {
+          header: true,
+          dynamicTyping: true,
+          complete: function (results) {
+            // Update the dashboard display with CSV data
+            updateDashboard(results.data);
+          }
+        });
+      } else {
+        alert('Please select a file before clicking "Read CSV".');
+      }
+    });
+  </script>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dengue Cases</title>
+
+  <!-- Include Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Include DataTables CSS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+
+  <style>
+    .container {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Redirect to add_form.html when the button is clicked -->
+        <button type="button" class="btn btn-primary" onclick="redirectToAddForm()">Add a New Case</button>
+    </div> <!-- Close the second container here -->
+
+    <div class="container">
+        <h2>Dengue Cases Dashboard</h2>
+    
+        <div id="dashboard">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Location</th>
+                        <th>Number of Cases</th>
+                        <th>Number of Deaths</th>
+                        <th>Date</th>
+                        <th>Region</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="dashboardTableBody">
+                    <!-- Display Data Here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Edit Case -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editModalLabel">Edit Case</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Your form fields for editing here -->
+              <form id="editCaseForm">
+                <input type="hidden" id="editId">
+                <div class="mb-3">
+                  <label for="editLoc" class="form-label">Location</label>
+                  <input type="text" class="form-control" id="editLoc" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editCases" class="form-label">Number of Cases</label>
+                  <input type="number" class="form-control" id="editCases" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editDeaths" class="form-label">Number of Deaths</label>
+                  <input type="number" class="form-control" id="editDeaths" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editReportedAt" class="form-label">Date</label>
+                  <input type="date" class="form-control" id="editReportedAt" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editRegion" class="form-label">Region</label>
+                  <input type="text" class="form-control" id="editRegion" required>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="saveEdit()">Update</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+   <!-- Include Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include DataTables JS -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <!-- Include papaparse library for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <script src="bundle.js"></script>
+
+    <!-- JavaScript function to redirect to add_form.html -->
+    <script>
+      function redirectToAddForm() {
+        window.location.href = 'add_form.html';
+      }
+    </script>
+
+    <script>
+      // Function to update the dashboard display
+      function updateDashboard(data) {
+          const dashboardTableBody = document.getElementById('dashboardTableBody');
+          dashboardTableBody.innerHTML = ''; // Clear previous content
+      
+          data.forEach((caseData) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+              <td>${caseData.loc}</td>
+              <td>${caseData.cases}</td>
+              <td>${caseData.deaths}</td>
+              <td>${caseData.reportedAt}</td>
+              <td>${caseData.region}</td>
+              <td>
+              <button type="button" class="btn btn-warning" onclick="openEditModal('${caseData.id}', '${caseData.loc}', ${caseData.cases}, ${caseData.deaths}, '${caseData.reportedAt}', '${caseData.region}')">Edit</button>
+              <button type="button" class="btn btn-danger" onclick="deleteCase('${caseData.id}')">Delete</button>
+              </td>
+          `;
+          dashboardTableBody.appendChild(row);
+          });
+
+          // Initialize DataTable
+          $('#dashboardTable').DataTable();
+      }
+
+      // Function to open the Edit modal and pre-fill data
+      function openEditModal(id, loc, cases, deaths, reportedAt, region) {
+        // Set the values of the input fields in the modal
+        document.getElementById('editId').value = id;
+        document.getElementById('editLoc').value = loc;
+        document.getElementById('editCases').value = cases;
+        document.getElementById('editDeaths').value = deaths;
+        document.getElementById('editReportedAt').value = reportedAt;
+        document.getElementById('editRegion').value = region;
+    
+        // Show the Edit modal
+        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+        editModal.show();
+      }
+
+      async function saveEdit() {
+        const editId = document.getElementById('editId').value;
+        const editLoc = document.getElementById('editLoc').value;
+        const editCases = parseInt(document.getElementById('editCases').value);
+        const editDeaths = parseInt(document.getElementById('editDeaths').value);
+        const editReportedAt = document.getElementById('editReportedAt').value;
+        const editRegion = document.getElementById('editRegion').value;
+    
+        try {
+          // Update the document in Firestore
+          await updateDoc(doc(colRef, editId), {
+            loc: editLoc,
+            cases: editCases,
+            deaths: editDeaths,
+            reportedAt: editReportedAt,
+            region: editRegion,
+          });
+    
+          // Close the modal
+          const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+          editModal.hide();
+        } catch (error) {
+          console.error('Error updating document: ', error);
+        }
+      }
+    
+      // Add a listener for the form submission
+      const editCaseForm = document.getElementById('editCaseForm');
+      editCaseForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        saveEdit();
+      });
+    </script>
+
+    <script>
+      // Read CSV button functionality
+      document.getElementById('readCsvBtn').addEventListener('click', function () {
+        const fileInput = document.getElementById('file');
+        const file = fileInput.files[0];
+
+        if (file) {
+          Papa.parse(file, {
+            header: true,
+            dynamicTyping: true,
+            complete: function (results) {
+              // Update the dashboard display with CSV data
+              updateDashboard(results.data);
+            }
+          });
+        } else {
+          alert('Please select a file before clicking "Read CSV".');
+        }
+      });
+    </script>
+</body>
+</html>
