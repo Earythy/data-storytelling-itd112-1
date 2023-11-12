@@ -9,9 +9,6 @@
   <meta content="" name="description">
   <meta content="" name="keywords">
 
-  <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
-
   <!-- Moment.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
@@ -160,7 +157,7 @@
                   <h5 class="card-title">Stacked Bar Chart</h5>
     
                   <!-- Stacked Bar Chart -->
-                  <canvas id="stakedBarChart" style="max-height: 400px;"></canvas>
+                  <canvas id="stackedBarChart" style="max-height: 400px;"></canvas>
                   <!-- End Stacked Bar Chart -->
     
                 </div>
@@ -198,11 +195,12 @@
 <script src="assets/vendor/tinymce/tinymce.min.js"></script>
 <script src="assets/vendor/php-email-form/validate.js"></script>
 
+
   <!-- ======= Scripts ====== -->
   <script src="assets/js/main.js"></script>
 
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 <!-- firebase js -->
 <script type="module">
@@ -411,7 +409,7 @@ db2.collection('dengue')
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      const region = data['region'];
+      const region = data['loc'];
       const cases = data['cases'];
 
       // Check if the region is already in the map
@@ -462,7 +460,7 @@ db2.collection('dengue')
         plugins: {
           title: {
             display: true,
-            text: 'Cases by Region',
+            text: 'Cases by Location',
             color: 'black',
             font: {
               size: 20,
@@ -487,7 +485,7 @@ db2.collection('dengue')
             },
             title: {
               display: true,
-              text: 'Region',
+              text: 'Location',
               color: 'black',
               font: {
                 size: 12,
@@ -594,21 +592,97 @@ db2.collection('dengue')
               family: 'Poppins'
             }
           },
-          legend: {
-            labels: {
-              color: 'black',
-              font: {
-                size: 15,
-                family: 'Poppins'
-              }
-            }
-          }
+         // legend: {
+          //  labels: {
+          //    color: 'black',
+          //    font: {
+         //       size: 15,
+         //       family: 'Poppins'
+          //    }
+           // }
+          //}
         },
       }
     });
   }, (error) => {
     console.error("Error retrieving data from Firestore: ", error);
   });
+
+// Doughnut chart
+const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+let chartDoughnut;
+
+db2.collection('dengue')
+  .onSnapshot((querySnapshot) => {
+    const regionDeathsMap = new Map(); // Map to store deaths aggregated by region
+    const regionColorsMap = new Map(); // Map to store random colors for each region
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const region = data['region'];
+      const deaths = data['deaths'];
+
+      // Check if the region is already in the map
+      if (regionDeathsMap.has(region)) {
+        // If yes, update the total deaths for that region
+        regionDeathsMap.set(region, regionDeathsMap.get(region) + deaths);
+      } else {
+        // If no, add a new entry in the map for that region
+        regionDeathsMap.set(region, deaths);
+
+        // Generate a random color for the legend for each unique region
+        const randomColor = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 1)`;
+        regionColorsMap.set(region, randomColor);
+      }
+    });
+
+    const labels = [...regionDeathsMap.keys()];
+    const deathsData = [...regionDeathsMap.values()];
+
+    // Get random colors for each region
+    const randomColors = labels.map((region) => regionColorsMap.get(region));
+
+    const doughnutData = {
+      labels: labels,
+      datasets: [{
+        data: deathsData,
+        backgroundColor: randomColors,
+        borderColor: randomColors.map(color => color.replace('0.7', '1')), // Use the same colors for border
+        borderWidth: 1,
+      }],
+    };
+
+    if (chartDoughnut) {
+      chartDoughnut.destroy();
+    }
+
+    chartDoughnut = new Chart(ctxDoughnut, {
+      type: 'doughnut',
+      data: doughnutData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 1000,
+          easing: 'easeOutBounce',
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Deaths by Region',
+            color: 'black',
+            font: {
+              size: 20,
+              family: 'Poppins',
+            },
+          },
+        },
+      },
+    });
+  }, (error) => {
+    console.error("Error retrieving data from Firestore: ", error);
+  });
+
 
 // Radar chart
 const ctxRadar = document.getElementById('radarChart').getContext('2d');
@@ -696,9 +770,305 @@ db2.collection('dengue')
     console.error("Error retrieving data from Firestore: ", error);
   });
 
+// Polar Area chart
+  const ctxPolarArea = document.getElementById('polarAreaChart').getContext('2d');
+  let chartPolarArea;
+  
+  db2.collection('dengue')
+    .onSnapshot((querySnapshot) => {
+      const regionDeathsMap = new Map(); // Map to store deaths aggregated by region
+      const regionColorsMap = new Map(); // Map to store random colors for each region
+  
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const region = data['region'];
+        const deaths = data['deaths'];
+  
+        // Check if the region is already in the map
+        if (regionDeathsMap.has(region)) {
+          // If yes, update the total deaths for that region
+          regionDeathsMap.set(region, regionDeathsMap.get(region) + deaths);
+        } else {
+          // If no, add a new entry in the map for that region
+          regionDeathsMap.set(region, deaths);
+  
+          // Generate a random color for the legend for each unique region
+          const randomColor = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 1)`;
+          regionColorsMap.set(region, randomColor);
+        }
+      });
+  
+      const labels = [...regionDeathsMap.keys()];
+      const deathsData = [...regionDeathsMap.values()];
+  
+      // Get random colors for each region
+      const randomColors = labels.map((region) => regionColorsMap.get(region));
+  
+      const polarAreaData = {
+        labels: labels,
+        datasets: [{
+          data: deathsData,
+          backgroundColor: randomColors,
+          borderColor: randomColors.map(color => color.replace('0.7', '1')), // Use the same colors for border
+          borderWidth: 1,
+        }],
+      };
+  
+      if (chartPolarArea) {
+        chartPolarArea.destroy();
+      }
+  
+      chartPolarArea = new Chart(ctxPolarArea, {
+        type: 'polarArea',
+        data: polarAreaData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 1000,
+            easing: 'easeOutBounce',
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Deaths by Region',
+              color: 'black',
+              font: {
+                size: 20,
+                family: 'Poppins',
+              },
+            },
+            //legend: {
+            //  display: true,
+            //  labels: {
+            //    color: 'black',
+             //   font: {
+             //     size: 15,
+             //     family: 'Poppins',
+            //    },
+             // },
+            //},
+          },
+        },
+      });
+    }, (error) => {
+      console.error("Error retrieving data from Firestore: ", error);
+    });
+  
+// Stacked Bar chart 
+    const ctxStackedBar = document.getElementById('stackedBarChart').getContext('2d');
+    let chartStackedBar;
+    
+    db2.collection('dengue')
+      .onSnapshot((querySnapshot) => {
+        const regionData = {};
+        const legendColors = ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)']; // Colors for deaths and cases
+    
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const region = data['region'];
+          const cases = data['cases'];
+          const deaths = data['deaths'];
+    
+          if (!regionData[region]) {
+            regionData[region] = { cases: 0, deaths: 0 };
+          }
+    
+          regionData[region].cases += cases;
+          regionData[region].deaths += deaths;
+        });
+    
+        const labels = Object.keys(regionData);
+        const datasets = [{
+          label: 'Cases',
+          data: labels.map(region => regionData[region].cases),
+          backgroundColor: legendColors[0],
+        }, {
+          label: 'Deaths',
+          data: labels.map(region => regionData[region].deaths),
+          backgroundColor: legendColors[1],
+        }];
+    
+        if (chartStackedBar) {
+          chartStackedBar.destroy();
+        }
+    
+        chartStackedBar = new Chart(ctxStackedBar, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: datasets,
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 1000,
+              easing: 'easeOutBounce',
+            },
+            plugins: {
+              title: {
+                display: true,
+                text: 'Cases and Deaths by Region',
+                color: 'black',
+                font: {
+                  size: 20,
+                  family: 'Poppins',
+                },
+              },
+              legend: {
+                display: true,
+                labels: {
+                  color: 'black',
+                  font: {
+                    size: 15,
+                    family: 'Poppins',
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                stacked: true,
+                grid: {
+                  display: false,
+                },
+                title: {
+                  display: true,
+                  text: 'Region',
+                  color: 'black',
+                  font: {
+                    size: 12,
+                    family: 'Poppins',
+                  },
+                },
+                ticks: {
+                  color: 'black',
+                  font: {
+                    size: 10,
+                    family: 'Poppins',
+                  },
+                },
+              },
+              y: {
+                stacked: true,
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(0, 0, 0, 0.1)',
+                },
+                title: {
+                  display: true,
+                  text: 'Number of Cases/Deaths',
+                  color: 'black',
+                  font: {
+                    size: 12,
+                    family: 'Poppins',
+                  },
+                },
+                ticks: {
+                  stepSize: 1,
+                  color: 'black',
+                  font: {
+                    size: 10,
+                    family: 'Poppins',
+                  },
+                },
+              },
+            },
+          },
+        });
+      }, (error) => {
+        console.error("Error retrieving data from Firestore: ", error);
+      });
+    
 
+  // Bubble chart
+  const ctxBubble = document.getElementById('bubbleChart').getContext('2d');
+  let chartBubble;
 
+  db.collection('dengue')
+    .orderBy('reportedAt', 'asc')
+    .onSnapshot((querySnapshot) => {
+      const bubbleData = [];
 
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const location = data['loc'];
+        const cases = data['cases'];
+        const deaths = data['deaths'];
+        const reportedAt = moment(data['reportedAt']).format('MM/DD/YYYY');
+
+        bubbleData.push({
+          label: location,
+          x: reportedAt,
+          y: deaths,
+          r: cases, 
+        });
+      });
+
+      const bubbleDataset = {
+        data: bubbleData,
+        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+        borderColor: 'rgba(75, 192, 192, 1)', 
+        borderWidth: 1,
+      };
+
+      if (chartBubble) {
+        chartBubble.destroy();
+      }
+
+      chartBubble = new Chart(ctxBubble, {
+        type: 'bubble',
+        data: {
+          datasets: [bubbleDataset],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 1000,
+            easing: 'easeOutBounce',
+          },
+          plugins: {
+            title: {
+              display: true,
+              text: 'Cases and Deaths by Location',
+              color: 'black',
+              font: {
+                size: 20,
+                family: 'Poppins',
+              },
+            },
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Reported At',
+                color: 'black',
+                font: {
+                  size: 12,
+                  family: 'Poppins',
+                },
+              },
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Deaths',
+                color: 'black',
+                font: {
+                  size: 12,
+                  family: 'Poppins',
+                },
+              },
+            },
+          },
+        },
+      });
+    }, (error) => {
+      console.error("Error retrieving data from Firestore: ", error);
+    });
 </script>
 
 </body>
