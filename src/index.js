@@ -78,3 +78,4 @@ addCaseForm.addEventListener('submit', async (e) => {
     console.error('Error adding document: ', error);
   }
 });
+
