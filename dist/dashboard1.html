@@ -5,13 +5,13 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-  <title>Forms / Dengue</title>
+  <title>Dashboard</title>
   <meta content="" name="description">
   <meta content="" name="keywords">
 
-   <!-- Firebase -->
-   <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
-   <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.2/firebase-firestore.js"></script>
 
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
@@ -40,6 +40,7 @@
   <script src="https://kit.fontawesome.com/334c45a40c.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
+  
 </head>
 
 <body>
@@ -279,19 +280,19 @@
     <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-        <a class="nav-link collapsed" href="dashboard.html">
+        <a class="nav-link " href="dashboard.html">
           <i class="bi bi-grid"></i>
           <span>Dashboard</span>
         </a>
       </li><!-- End Dashboard Nav -->
 
       <li class="nav-item">
-        <a class="nav-link " data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-journal-text"></i><span>Forms</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
-            <a href="dengue-form.html" class="active">
+            <a href="dengue-form.html">
               <i class="bi bi-circle"></i><span>Dengue Form</span>
             </a>
           </li>
@@ -302,7 +303,7 @@
         <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
           <i class="bi bi-layout-text-window-reverse"></i><span>Tables</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="tables-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
             <li>
                 <a href="dengue-table.html">
                   <i class="bi bi-circle"></i><span>Dengue Table</span>
@@ -351,101 +352,74 @@
 
   </aside><!-- End Sidebar-->
 
- <!-- ======= Main ======= -->
+  <!-- ======= Main ======= -->
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Form Layouts</h1>
+      <h1>Dashboard</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="dashboard.html">Home</a></li>
-          <li class="breadcrumb-item">Forms</li>
-          <li class="breadcrumb-item active">Dengue</li>
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active">Dashboard</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
-    
-    <section class="section">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Add Dengue Case</h5>
 
-              <!-- Add Dengue Case -->
-              <form class="add" id="addForm">
-                <div class="mb-3">
-                    <div class="form-floating">
-                        <input type="text" class="form-control" id="loc" placeholder="Location" name="loc" required>
-                        <label for="loc">Location</label>
+    <section class="section dashboard">
+      <div class="row">
+
+        <!-- Left side columns -->
+        <div class="col-lg-8">
+          <div class="row">
+
+             <!-- Cases Card -->
+             <div class="col-xxl-4 col-md-6">
+                <div class="card info-card sales-card">
+  
+                  <div class="card-body">
+                    <h5 class="card-title">Cases <span>| Total</span></h5>
+  
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                      </div>
+                      <div class="ps-3">
+                        <h6 id="totalCases">0</h6>
+                      </div>
                     </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="cases" placeholder="Number of Cases" name="cases" required>
-                        <label for="cases">Number of Cases</label>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-floating">
-                        <input type="number" class="form-control" id="deaths" placeholder="Number of Deaths" name="deaths" required>
-                        <label for="deaths">Number of Deaths</label>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-floating">
-                        <input type="date" class="form-control" id="reportedAt" placeholder="Date Reported" name="date" required>
-                        <label for="reportedAt">Date Reported</label>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                  <div class="form-floating">
-                      <select class="form-select" id="region" name="region" required>
-                          <option value="" selected disabled>Select a Region</option>
-                          <option value="Region I - Ilocos Region">Region I - Ilocos Region</option>
-                          <option value="Region II - Cagayan Valley">Region II - Cagayan Valley</option>
-                          <option value="Region III - Central Luzon">Region III - Central Luzon</option>
-                          <option value="Region IV-A - Calabarzon">Region IV-A - Calabarzon</option>
-                          <option value="Region IV-B - Mimaropa">Region IV-B - Mimaropa</option>
-                          <option value="Region V - Bicol Region">Region V - Bicol Region</option>
-                          <option value="Region VI - Western Visayas">Region VI - Western Visayas</option>
-                          <option value="Region VII - Central Visayas">Region VII - Central Visayas</option>
-                          <option value="Region VIII - Eastern Visayas">Region VIII - Eastern Visayas</option>
-                          <option value="Region IX - Zamboanga Peninsula">Region IX - Zamboanga Peninsula</option>
-                          <option value="Region X - Northern Mindanao">Region X - Northern Mindanao</option>
-                          <option value="Region XI - Davao Region">Region XI - Davao Region</option>
-                          <option value="Region XII - Soccsksargen">Region XII - Soccsksargen</option>
-                          <option value="Region XIII - Caraga">Region XIII - Caraga</option>
-                          <option value="National Capital Region (NCR) - Metro Manila">National Capital Region (NCR) - Metro Manila</option>
-                          <option value="Cordillera Administrative Region (CAR)">Cordillera Administrative Region (CAR)</option>
-                          <option value="Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)">Bangsamoro Autonomous Region in Muslim Mindanao (BARMM)</option>
-                      </select>
-                      <label for="region">Region</label>
                   </div>
-              </div>
-          
-                <div class="text-center">
-                    <a href="dengue-table.html" class="btn btn-danger">Cancel</a>
-                    <button type="reset" class="btn btn-warning">Reset</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                  </div>
-            
-              </form><!-- End Form -->
+  
+                </div>
+              </div><!-- End Cases Card -->
 
-            </div>
+            <!-- Deaths Card -->
+            <div class="col-xxl-4 col-md-6">
+                <div class="card info-card revenue-card">
+  
+                  <div class="card-body">
+                    <h5 class="card-title">Deaths <span>| Total</span></h5>
+  
+                    <div class="d-flex align-items-center">
+                      <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="bi bi-heartbreak-fill"></i>
+                      </div>
+                      <div class="ps-3">
+                        <h6 id="totalDeaths">0</h6>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div><!-- End Deaths Card -->
+
           </div>
+        </div><!-- End Left side columns -->
 
-        </div>
       </div>
     </section>
 
   </main><!-- End #main -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
@@ -464,58 +438,63 @@
 
   <script>
     // Check if the user is authenticated
-    document.addEventListener("DOMContentLoaded", function () {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!user) {
-        // Redirect to the login page if not authenticated
-        window.location.href = "login.html";
-      }
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+      // Redirect to the login page if not authenticated
+      window.location.href = "login.html";
+    }
+  
+  // Function to filter data by year and update dashboard
+  window.filterByYear = (year) => {
+    const q = query(
+      colRef,
+      where('reportedAt', '>=', new Date(`${year}-01-01`)),
+      where('reportedAt', '<=', new Date(`${year}-12-31`)),
+      orderBy('reportedAt')
+    );
+  
+    onSnapshot(q, (snapshot) => {
+      let dengue = [];
+      snapshot.docs.forEach(doc => {
+        dengue.push({ ...doc.data(), id: doc.id });
+      });
+      updateDashboard(dengue);
     });
+  };
+  
+  // Calculate and update yearly cases
+  const updateDashboard = (dengueData) => {
+    const totalCases = dengueData.reduce((sum, record) => sum + record.cases, 0);
+    document.getElementById('totalCases').textContent = totalCases;
+  
+    const totalDeaths = dengueData.reduce((sum, record) => sum + record.deaths, 0);
+    document.getElementById('totalDeaths').textContent = totalDeaths;
+  };
+  
+  // Process and prepare data for the chart
+  const prepareChartData = () => {
+    db.collection('dengue').get().then(querySnapshot => {
+      let chartData = {};
+      querySnapshot.forEach(doc => {
+        const data = doc.data();
+        const year = data.reportedAt.toDate().getFullYear();
+        if (!chartData[year]) {
+          chartData[year] = { cases: 0, deaths: 0 };
+        }
+        chartData[year].cases += data.cases;
+        chartData[year].deaths += data.deaths;
+      });
+      renderChart(chartData);
+    });
+  };
+  
+  // Call this function to initialize the chart with data
+  prepareChartData();
+  
   </script>
   
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const addForm = document.getElementById('addForm');
-
-      // Add an event listener for the form submission
-      addForm.addEventListener('submit', function (e) {
-        e.preventDefault(); // Prevent the default form submission
-
-        // Get form data
-        const loc = document.getElementById('loc').value;
-        const cases = document.getElementById('cases').value;
-        const deaths = document.getElementById('deaths').value;
-        const reportedAt = document.getElementById('reportedAt').value;
-        const region = document.getElementById('region').value;
-
-        // Validate form data (you can add more validation if needed)
-        if (!loc || !cases || !deaths || !reportedAt || !region) {
-          // Show an error alert if any field is empty
-          Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'All fields are required!',
-          });
-          return;
-        }
-
-        // Simulate a successful submission (you should replace this with your actual submission logic)
-        // For demonstration purposes, always show the success alert
-        Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: 'New Dengue Case added Successfully!',
-        });
-
-        // Reset the form after a successful submission
-        addForm.reset();
-      });
-    });
-  </script>
-
   <script type="module">
-
+  
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-analytics.js";
@@ -567,7 +546,5 @@
         }
       });
     </script>
-  
 </body>
-
 </html>
